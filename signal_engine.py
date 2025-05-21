@@ -19,9 +19,11 @@ def analyze_market(pair: str):
 
         latest = df.iloc[-1]
 
-        volume_ok = latest.get("Volume_Signal", False)
-        if isinstance(volume_ok, (pd.Series, np.ndarray)):
-            volume_ok = volume_ok.iloc[-1] if not volume_ok.empty else False
+        # Seguridad total para obtener el valor booleano
+        try:
+            volume_ok = bool(latest["Volume_Signal"])
+        except Exception:
+            volume_ok = False
 
         if (
             pd.notna(latest["EMA"])
@@ -29,7 +31,7 @@ def analyze_market(pair: str):
             and pd.notna(latest["ATR"])
             and latest["Close"] > latest["EMA"]
             and latest["MACD"] > 0
-            and bool(volume_ok)
+            and volume_ok
         ):
             sl = round(latest["Close"] - latest["ATR"], 2)
             tp = round(latest["Close"] + latest["ATR"] * 2, 2)
