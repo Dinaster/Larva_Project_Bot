@@ -13,35 +13,26 @@ async def periodic_job(context: ContextTypes.DEFAULT_TYPE):
 async def main():
     print("🚀 Alpha Break Pro 777 bot is starting...", flush=True)
     app = ApplicationBuilder().token(BOT_TOKEN).build()
+
+    # Cargar comandos como /start, /check, /why
     setup_handlers(app)
+
+    # Activar job scheduler para señales cada hora
     app.job_queue.run_repeating(
         periodic_job,
         interval=3600,
         first=10,
         job_kwargs={"max_instances": 1, "coalesce": True}
     )
+
+    # Inicializar y lanzar bot
     await app.initialize()
     await app.start()
     print("✅ Bot is running...", flush=True)
-    await asyncio.Event().wait()
+
+    # Necesario para que lea comandos tipo /start, /check
+    await app.updater.start_polling()
+    await app.updater.idle()
 
 if __name__ == "__main__":
     asyncio.run(main())
-
-async def main():
-    print("🚀 Alpha Break Pro 777 bot is starting...", flush=True)
-    app = ApplicationBuilder().token(BOT_TOKEN).build()
-    setup_handlers(app)
-    app.job_queue.run_repeating(
-        periodic_job,
-        interval=3600,
-        first=10,
-        job_kwargs={"max_instances": 1, "coalesce": True}
-    )
-    await app.initialize()
-    await app.start()
-    print("✅ Bot is running...", flush=True)
-
-    # ⚠️ NECESARIO PARA QUE FUNCIONEN LOS COMANDOS
-    await app.updater.start_polling()
-    await app.updater.idle()
