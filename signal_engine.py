@@ -1,4 +1,3 @@
-
 import yfinance as yf
 import matplotlib.pyplot as plt
 from io import BytesIO
@@ -17,19 +16,13 @@ def analyze_market(pair: str):
         df["ATR"] = df["High"] - df["Low"]
         df["ATR"] = df["ATR"].rolling(window=14).mean()
 
-        latest = df.iloc[-1]
+        idx = df.index[-1]
+        latest = df.loc[idx]
 
-        # Manejo extremadamente defensivo del campo Volume_Signal
-        volume_ok = False
+        # Extrae correctamente el valor booleano de Volume_Signal
         try:
-            raw_value = latest["Volume_Signal"]
-            print(f"📊 DEBUG Volume_Signal raw type: {type(raw_value)}, value: {raw_value}")
-            if isinstance(raw_value, (pd.Series, np.ndarray)):
-                volume_ok = raw_value.iloc[-1] if not raw_value.empty else False
-            else:
-                volume_ok = bool(raw_value)
-        except Exception as e:
-            print(f"⚠️ Error handling Volume_Signal: {e}")
+            volume_ok = bool(df.at[idx, "Volume_Signal"])
+        except Exception:
             volume_ok = False
 
         if (
@@ -58,3 +51,4 @@ def analyze_market(pair: str):
     except Exception as e:
         print(f"❌ Error analyzing {pair}: {e}")
         return None, None
+
