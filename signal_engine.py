@@ -6,7 +6,7 @@ import numpy as np
 
 def analyze_market(pair: str):
     try:
-        df = yf.download(pair, period="3mo", interval="1h")
+        df = yf.download(pair, period="3mo", interval="1h", progress=False)
         if df.empty or len(df) < 50:
             return None, None
 
@@ -18,18 +18,21 @@ def analyze_market(pair: str):
 
         latest = df.iloc[-1]
 
-        # Verifica que los datos sean válidos
-        if pd.notna(latest["EMA"]) and pd.notna(latest["MACD"]) and pd.notna(latest["Volume_Signal"]) and pd.notna(latest["ATR"]):
-            if latest["Close"] > latest["EMA"] and latest["MACD"] > 0 and latest["Volume_Signal"]:
-                sl = round(latest["Close"] - latest["ATR"], 2)
-                tp = round(latest["Close"] + latest["ATR"] * 2, 2)
-                signal = f"🚨 Buy Signal for {pair}\nPrice: {latest['Close']:.2f}\nSL: {sl} | TP: {tp}"
-            else:
-                return None, None
+        if (
+            pd.notna(latest["EMA"])
+            and pd.notna(latest["MACD"])
+            and pd.notna(latest["Volume_Signal"])
+            and pd.notna(latest["ATR"])
+            and latest["Close"] > latest["EMA"]
+            and latest["MACD"] > 0
+            and bool(latest["Volume_Signal"].item())
+        ):
+            sl = round(latest["Close"] - latest["ATR"], 2)
+            tp = round(latest["Close"] + latest["ATR"] * 2, 2)
+            signal = f"🚨 Buy Signal for {pair}\nPrice: {latest['Close']:.2f}\nSL: {sl} | TP: {tp}"
         else:
             return None, None
 
-        # Generar gráfico
         fig, ax = plt.subplots()
         df["Close"].tail(50).plot(ax=ax, label="Close")
         df["EMA"].tail(50).plot(ax=ax, label="EMA 21")
