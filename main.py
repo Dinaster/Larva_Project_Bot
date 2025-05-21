@@ -27,3 +27,21 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
+async def main():
+    print("🚀 Alpha Break Pro 777 bot is starting...", flush=True)
+    app = ApplicationBuilder().token(BOT_TOKEN).build()
+    setup_handlers(app)
+    app.job_queue.run_repeating(
+        periodic_job,
+        interval=3600,
+        first=10,
+        job_kwargs={"max_instances": 1, "coalesce": True}
+    )
+    await app.initialize()
+    await app.start()
+    print("✅ Bot is running...", flush=True)
+
+    # ⚠️ NECESARIO PARA QUE FUNCIONEN LOS COMANDOS
+    await app.updater.start_polling()
+    await app.updater.idle()
