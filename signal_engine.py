@@ -9,6 +9,7 @@ def analyze_market(pair: str):
         df = yf.download(pair, period="3mo", interval="1h")
         if df.empty or len(df) < 50:
             return None, None
+
         df["EMA"] = df["Close"].ewm(span=21).mean()
         df["MACD"] = df["Close"].ewm(span=12).mean() - df["Close"].ewm(span=26).mean()
         df["Volume_Signal"] = df["Volume"] > df["Volume"].rolling(window=20).mean()
@@ -16,13 +17,19 @@ def analyze_market(pair: str):
         df["ATR"] = df["ATR"].rolling(window=14).mean()
 
         latest = df.iloc[-1]
-        if latest["Close"] > latest["EMA"] and latest["MACD"] > 0 and latest["Volume_Signal"]:
-            sl = round(latest["Close"] - latest["ATR"], 2)
-            tp = round(latest["Close"] + latest["ATR"] * 2, 2)
-            signal = f"🚨 Buy Signal for {pair}\nPrice: {latest['Close']:.2f}\nSL: {sl} | TP: {tp}"
+
+        # Verifica que los datos sean válidos
+        if pd.notna(latest["EMA"]) and pd.notna(latest["MACD"]) and pd.notna(latest["Volume_Signal"]) and pd.notna(latest["ATR"]):
+            if latest["Close"] > latest["EMA"] and latest["MACD"] > 0 and latest["Volume_Signal"]:
+                sl = round(latest["Close"] - latest["ATR"], 2)
+                tp = round(latest["Close"] + latest["ATR"] * 2, 2)
+                signal = f"🚨 Buy Signal for {pair}\nPrice: {latest['Close']:.2f}\nSL: {sl} | TP: {tp}"
+            else:
+                return None, None
         else:
             return None, None
 
+        # Generar gráfico
         fig, ax = plt.subplots()
         df["Close"].tail(50).plot(ax=ax, label="Close")
         df["EMA"].tail(50).plot(ax=ax, label="EMA 21")
