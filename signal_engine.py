@@ -1,3 +1,4 @@
+
 import yfinance as yf
 import matplotlib.pyplot as plt
 from io import BytesIO
@@ -18,9 +19,9 @@ def analyze_market(pair: str):
 
         latest = df.iloc[-1]
 
-        volume_ok = latest["Volume_Signal"]
+        volume_ok = latest.get("Volume_Signal", False)
         if isinstance(volume_ok, (pd.Series, np.ndarray)):
-            volume_ok = volume_ok.iloc[-1]
+            volume_ok = volume_ok.iloc[-1] if not volume_ok.empty else False
 
         if (
             pd.notna(latest["EMA"])
