@@ -13,11 +13,7 @@ async def periodic_job(context: ContextTypes.DEFAULT_TYPE):
 async def main():
     print("🚀 Alpha Break Pro 777 bot is starting...", flush=True)
     app = ApplicationBuilder().token(BOT_TOKEN).build()
-
-    # Cargar comandos como /start, /check, /why
     setup_handlers(app)
-
-    # Activar job scheduler para señales cada hora
     app.job_queue.run_repeating(
         periodic_job,
         interval=3600,
@@ -25,12 +21,13 @@ async def main():
         job_kwargs={"max_instances": 1, "coalesce": True}
     )
 
-    # Inicializar y lanzar bot
     await app.initialize()
     await app.start()
-    print("✅ Bot is running...", flush=True)
+    
+    # 👋 Mensaje de vida en el grupo
+    await app.bot.send_message(chat_id=int(os.getenv("GROUP_CHAT_ID")), text="👋 Alpha Break Pro 777 is online and watching the market!")
 
-    # Necesario para que lea comandos tipo /start, /check
+    print("✅ Bot is running...", flush=True)
     await app.updater.start_polling()
     await app.updater.idle()
 
