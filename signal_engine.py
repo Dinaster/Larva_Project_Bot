@@ -18,14 +18,17 @@ def analyze_market(pair: str):
 
         latest = df.iloc[-1]
 
+        volume_ok = latest["Volume_Signal"]
+        if isinstance(volume_ok, (pd.Series, np.ndarray)):
+            volume_ok = volume_ok.iloc[-1]
+
         if (
             pd.notna(latest["EMA"])
             and pd.notna(latest["MACD"])
-            and pd.notna(latest["Volume_Signal"])
             and pd.notna(latest["ATR"])
             and latest["Close"] > latest["EMA"]
             and latest["MACD"] > 0
-            and bool(latest["Volume_Signal"].item())
+            and bool(volume_ok)
         ):
             sl = round(latest["Close"] - latest["ATR"], 2)
             tp = round(latest["Close"] + latest["ATR"] * 2, 2)
