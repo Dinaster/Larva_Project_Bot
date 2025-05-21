@@ -1,3 +1,4 @@
+
 import yfinance as yf
 import matplotlib.pyplot as plt
 from io import BytesIO
@@ -16,14 +17,14 @@ def analyze_market(pair: str):
         df["ATR"] = df["High"] - df["Low"]
         df["ATR"] = df["ATR"].rolling(window=14).mean()
 
-        idx = df.index[-1]
-        latest = df.loc[idx]
+        latest = df.iloc[-1]
 
-        # Extrae correctamente el valor booleano de Volume_Signal
+        # Extraer correctamente Volume_Signal como escalar
+        volume_ok = False
         try:
-            volume_ok = bool(df.at[idx, "Volume_Signal"])
-        except Exception:
-            volume_ok = False
+            volume_ok = bool(df["Volume_Signal"].iloc[-1])
+        except Exception as e:
+            print(f"⚠️ Error casting Volume_Signal: {e}")
 
         if (
             pd.notna(latest["EMA"])
@@ -51,4 +52,5 @@ def analyze_market(pair: str):
     except Exception as e:
         print(f"❌ Error analyzing {pair}: {e}")
         return None, None
+
 
