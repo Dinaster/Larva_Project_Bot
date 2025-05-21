@@ -19,10 +19,17 @@ def analyze_market(pair: str):
 
         latest = df.iloc[-1]
 
-        # Seguridad total para obtener el valor booleano
+        # Manejo extremadamente defensivo del campo Volume_Signal
+        volume_ok = False
         try:
-            volume_ok = bool(latest["Volume_Signal"])
-        except Exception:
+            raw_value = latest["Volume_Signal"]
+            print(f"📊 DEBUG Volume_Signal raw type: {type(raw_value)}, value: {raw_value}")
+            if isinstance(raw_value, (pd.Series, np.ndarray)):
+                volume_ok = raw_value.iloc[-1] if not raw_value.empty else False
+            else:
+                volume_ok = bool(raw_value)
+        except Exception as e:
+            print(f"⚠️ Error handling Volume_Signal: {e}")
             volume_ok = False
 
         if (
@@ -49,5 +56,5 @@ def analyze_market(pair: str):
         buffer.seek(0)
         return signal, buffer
     except Exception as e:
-        print(f"Error analyzing {pair}: {e}")
+        print(f"❌ Error analyzing {pair}: {e}")
         return None, None
