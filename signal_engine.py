@@ -1,11 +1,7 @@
-import yfinance as yf
-import matplotlib.pyplot as plt
 from io import BytesIO
 
-import yfinance as yf
 import matplotlib.pyplot as plt
-from io import BytesIO
-import pandas as pd
+import yfinance as yf
 
 
 def analyze_market(pair: str):

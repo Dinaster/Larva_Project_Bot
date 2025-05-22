@@ -1,5 +1,3 @@
-import os
-import pandas as pd
 from telegram import Update
 from telegram.ext import ContextTypes, Application
 
@@ -7,7 +5,6 @@ import Config
 from analytics.EmaAnalyzer import EMAAnalyzer
 from analytics.MacdAnalyzer import MACDAnalyzer
 from signal_engine import analyze_market
-from io import BytesIO
 from utils.data_fetcher import get_market_data  # Ejemplo de función para obtener datos
 
 chat_ids = set()
